@@ -1,0 +1,36 @@
+FROM ubuntu:16.04
+
+RUN apt-get update && apt-get -y upgrade && \
+    apt-get -y install --no-install-recommends gcc automake zlib1g-dev make cmake
+
+RUN apt-get -y install --no-install-recommends g++ git
+
+RUN apt-get -y install --no-install-recommends build-essential fakeroot dpkg-dev
+
+RUN apt-get -y install --no-install-recommends systemtap-sdt-dev
+
+RUN apt-get -y install --no-install-recommends gawk perl autoconf gettext bison
+
+RUN apt-get -y install --no-install-recommends wget
+
+RUN apt-get -y install --no-install-recommends texi2html texinfo
+
+RUN apt-get -y install --no-install-recommends flex bison libwww-perl patch libgmp-dev
+
+RUN apt-get -y install --no-install-recommends ninja-build
+
+RUN apt-get -y install --no-install-recommends file
+
+# work with gcc8 from now on
+RUN apt-get update
+RUN apt-get install --no-install-recommends -y software-properties-common
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test -y
+RUN apt-get update -q
+RUN apt-get install --no-install-recommends g++-8 gcc-8 -y
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+RUN update-alternatives --install /usr/bin/gcc-ar gcc-ar /usr/bin/gcc-ar-8 60
+RUN update-alternatives --install /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-8 60
+RUN update-alternatives --install /usr/bin/x86_64-linux-gnu-gcc x86_64-linux-gnu-gcc /usr/bin/x86_64-linux-gnu-gcc-8 60 --slave /usr/bin/x86_64-linux-gnu-g++ x86_64-linux-gnu-g++ /usr/bin/x86_64-linux-gnu-g++-8
+
+# get java
+RUN apt-get install -y --no-install-recommends default-jdk
