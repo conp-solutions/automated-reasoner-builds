@@ -34,3 +34,6 @@ RUN update-alternatives --install /usr/bin/x86_64-linux-gnu-gcc x86_64-linux-gnu
 
 # get java
 RUN apt-get install -y --no-install-recommends default-jdk
+
+# get boost
+RUN apt-get install -y --no-install-recommends libboost-dev
