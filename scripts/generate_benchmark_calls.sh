@@ -30,6 +30,8 @@ usage: $SCRIPT [option] directory tool-cmd
                  as the last parameter in the call
 
    options:
+    -f filter .... command that reads from stdin and writes to stdout to filter
+                   or sort the spotted benchmarks
     -s suffix .... suffix of the benchmark files to be considered
     -w wrapper ... wrapper that is placed before solver
 
@@ -38,14 +40,16 @@ EOF
 
 # arguments to be used in the script
 BENCHMARK_FIRST=0  # have the benchmark file right after the solver binary
+declare -a FILTER  # filters to be used to sort the benchmarks, e.g. sort -V
 SUFFIX=""
 WRAPPER=""
 
 # evaluate options
-while getopts "be:hs:w:" OPTION; do
+while getopts "be:f:hs:w:" OPTION; do
     case $OPTION in
     b) BENCHMARK_FIRST=1 ;;
     e) ENVIRONMENT="$OPTARG " ;;
+    f) FILTER+=("$OPTARG") ;;
     h) usage; exit 0;;
     s) SUFFIX="$OPTARG" ;;
     w) WRAPPER="$OPTARG" ;;
@@ -71,11 +75,18 @@ then
 fi
 
 readlink -e ${TOOL_COMMAND[0]} &> /dev/null && TOOL_COMMAND[0]=$(readlink -e ${TOOL_COMMAND[0]})
-
 echo "generate benchmark for ${TOOL_COMMAND[0]}" 1>&2
 
+# filter all spotted benchmarks with given filters
+ALL_BENCHMARKS="$(find "$BENCHMARK_DIRECTORY" -type f $SUFFIX)"
+for filter in "${FILTER[@]}"
+do
+	echo "Filter: $filter"  1>&2
+	ALL_BENCHMARKS="$(echo "$ALL_BENCHMARKS" | ${filter})"
+done
+
 # generate benchmark list
-for benchmark in $(find "$BENCHMARK_DIRECTORY" -type f $SUFFIX | xargs)
+for benchmark in $ALL_BENCHMARKS
 do
 	unset RUN_CMD
 	declare -a RUN_CMD
